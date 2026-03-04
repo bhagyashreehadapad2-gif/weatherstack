@@ -2,8 +2,14 @@ import React from 'react';
 import { History, Calendar, Thermometer, Droplets, Wind } from 'lucide-react';
 
 const HistoricalView = ({ data }) => {
-    // Mocking historical data points for climate report
-    const historicalStats = [
+    // Priority: Real data, then mock data
+    const historicalStats = data?.historical ? Object.entries(data.historical).map(([date, details]) => ({
+        date,
+        temp: details.avgtemp,
+        humidity: details.humidity,
+        wind: details.wind_speed,
+        condition: details.condition || 'Clear'
+    })) : [
         { date: '2025-02-28', temp: 21, humidity: 45, wind: 12, condition: 'Sunny' },
         { date: '2025-02-27', temp: 19, humidity: 55, wind: 18, condition: 'Cloudy' },
         { date: '2025-02-26', temp: 18, humidity: 60, wind: 22, condition: 'Showers' },

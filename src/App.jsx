@@ -15,12 +15,30 @@ function App() {
   const [location, setLocation] = useState('New York');
   const [error, setError] = useState(null);
 
-  const fetchWeather = async (query) => {
+  const fetchWeather = async (query, type = 'current') => {
     if (!query) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await weatherService.getCurrent(query);
+      let data;
+      switch (type) {
+        case 'forecast':
+          data = await weatherService.getForecast(query);
+          break;
+        case 'marine':
+          data = await weatherService.getMarine(query);
+          break;
+        case 'historical':
+          // Using yesterday's date as a default for historical
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const dateStr = yesterday.toISOString().split('T')[0];
+          data = await weatherService.getHistorical(query, dateStr);
+          break;
+        case 'current':
+        default:
+          data = await weatherService.getCurrent(query);
+      }
       setWeatherData(data);
     } catch (err) {
       console.error(err);
@@ -31,8 +49,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetchWeather(location);
-  }, []);
+    fetchWeather(location, activeTab);
+  }, [activeTab, location]);
 
   const renderContent = () => {
     if (error) {
@@ -41,15 +59,21 @@ function App() {
           <div className="w-20 h-20 bg-accent-alt/10 rounded-full flex items-center justify-center mb-6">
             <MapPin className="text-accent-alt w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-bold font-accent mb-4 text-white">Location Not Found</h2>
+          <h2 className="text-3xl font-bold font-accent mb-4 text-white">Weather Insight Unavailable</h2>
+          <div className="bg-accent-alt/10 border border-accent-alt/20 p-6 rounded-2xl mb-8 max-w-md">
+            <p className="text-accent-alt font-bold text-sm uppercase tracking-widest mb-2">Error Details</p>
+            <p className="text-white font-medium">
+              {error}
+            </p>
+          </div>
           <p className="text-text-secondary max-w-md mx-auto mb-8 font-medium">
-            "{location}" could not be resolved. Please check the spelling or try searching for a different city or zip code.
+            We couldn't retrieve data for "{location}". This might be due to an invalid location name or API limitations (like rate limits in the free tier).
           </p>
           <button
-            onClick={() => fetchWeather('New York')}
+            onClick={() => { setLocation('New York'); fetchWeather('New York', activeTab); }}
             className="px-8 py-3 bg-accent-main text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/20 hover:scale-105 transition-transform"
           >
-            Reset to Default
+            Reset to New York
           </button>
         </div>
       );
@@ -186,7 +210,7 @@ function App() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="main-content">
-        <Header onSearch={(q) => { setLocation(q); fetchWeather(q); }} />
+        <Header onSearch={(q) => { setLocation(q); }} />
 
         <div className="flex-1 mt-6">
           {loading ? (

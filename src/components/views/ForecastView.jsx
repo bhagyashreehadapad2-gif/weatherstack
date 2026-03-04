@@ -2,8 +2,13 @@ import React from 'react';
 import { CloudRain, Sun, Wind, Droplets } from 'lucide-react';
 
 const ForecastView = ({ data }) => {
-    // Mocking forecast data if not available in free tier
-    const mockForecast = [
+    // Priority: Real data from API, then mock data for free tier
+    const forecastDays = data?.forecast ? Object.entries(data.forecast).map(([date, details]) => ({
+        day: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+        temp: details.avgtemp,
+        condition: details.condition || 'Clear',
+        icon: Sun // Defaulting to Sun for now, could map more icons
+    })) : [
         { day: 'Mon', temp: 22, condition: 'Sunny', icon: Sun },
         { day: 'Tue', temp: 19, condition: 'Cloudy', icon: Wind },
         { day: 'Wed', temp: 21, condition: 'Rain', icon: CloudRain },
@@ -23,7 +28,7 @@ const ForecastView = ({ data }) => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
-                    {mockForecast.map((item, index) => (
+                    {forecastDays.map((item, index) => (
                         <div key={index} className="glass-card p-4 flex flex-col items-center gap-3 text-center">
                             <span className="text-sm font-semibold text-text-secondary uppercase">{item.day}</span>
                             <item.icon className="w-8 h-8 text-accent-main" />

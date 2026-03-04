@@ -10,17 +10,40 @@ const weatherApi = axios.create({
   },
 });
 
+// Helper to handle API errors consistently
+const handleApiError = (error, context) => {
+  if (error.response) {
+    // Axios error with response
+    const apiError = error.response.data?.error;
+    if (apiError) {
+      throw new Error(`[${apiError.code}] ${apiError.info}`);
+    }
+    throw new Error(`HTTP Error: ${error.response.status}`);
+  } else if (error.request) {
+    // Request was made but no response received
+    if (window.location.protocol === 'https:' && BASE_URL.startsWith('http:')) {
+      throw new Error('Mixed Content Error: Weatherstack free tier requires HTTP, but site is running on HTTPS. Please check browser security settings or use a local dev server over HTTP.');
+    }
+    throw new Error('Network Error: No response from Weatherstack server.');
+  }
+  throw error;
+};
+
 export const weatherService = {
   getCurrent: async (query) => {
     try {
       const response = await weatherApi.get('/current', {
         params: { query },
       });
-      if (response.data.error) throw new Error(response.data.error.info);
+      if (response.data.error) {
+        const err = response.data.error;
+        throw new Error(`[${err.code}] ${err.info}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Weatherstack API Error (Current):', error);
-      throw error;
+      if (error.message.startsWith('[')) throw error;
+      handleApiError(error, 'Current');
     }
   },
 
@@ -29,11 +52,15 @@ export const weatherService = {
       const response = await weatherApi.get('/forecast', {
         params: { query, forecast_days: days },
       });
-      if (response.data.error) throw new Error(response.data.error.info);
+      if (response.data.error) {
+        const err = response.data.error;
+        throw new Error(`[${err.code}] ${err.info}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Weatherstack API Error (Forecast):', error);
-      throw error;
+      if (error.message.startsWith('[')) throw error;
+      handleApiError(error, 'Forecast');
     }
   },
 
@@ -42,25 +69,32 @@ export const weatherService = {
       const response = await weatherApi.get('/historical', {
         params: { query, historical_date: date },
       });
-      if (response.data.error) throw new Error(response.data.error.info);
+      if (response.data.error) {
+        const err = response.data.error;
+        throw new Error(`[${err.code}] ${err.info}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Weatherstack API Error (Historical):', error);
-      throw error;
+      if (error.message.startsWith('[')) throw error;
+      handleApiError(error, 'Historical');
     }
   },
 
   getMarine: async (query) => {
     try {
-      // Note: Marine might require a specific plan, adding wrapper for consistency
       const response = await weatherApi.get('/marine', {
         params: { query },
       });
-      if (response.data.error) throw new Error(response.data.error.info);
+      if (response.data.error) {
+        const err = response.data.error;
+        throw new Error(`[${err.code}] ${err.info}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Weatherstack API Error (Marine):', error);
-      throw error;
+      if (error.message.startsWith('[')) throw error;
+      handleApiError(error, 'Marine');
     }
   }
 };

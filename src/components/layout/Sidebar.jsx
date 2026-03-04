@@ -11,34 +11,38 @@ const Sidebar = ({ activeTab, onTabChange }) => {
     ];
 
     return (
-        <aside className="w-80 glass-panel p-8 flex flex-col gap-10 h-[calc(100vh-4rem)] sticky top-8">
-            <div className="flex items-center gap-4 px-2 mb-4">
-                <div className="w-10 h-10 bg-accent-main rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <span className="text-white font-bold text-2xl font-accent italic">W</span>
+        <aside className="w-80 glass-panel p-10 flex flex-col gap-12 h-[calc(100vh-6rem)] sticky top-12">
+            <div className="flex items-center gap-5 px-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-accent-main to-accent-soft rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/40 relative group/logo">
+                    <div className="absolute inset-0 bg-white/20 blur-md opacity-0 group-hover/logo:opacity-100 transition-opacity"></div>
+                    <span className="text-white font-black text-2xl font-accent italic relative z-10">W</span>
                 </div>
-                <h1 className="text-2xl font-bold font-accent tracking-tighter text-white">SkyCast<span className="text-accent-main italic">Pro</span></h1>
+                <div>
+                    <h1 className="text-2xl font-extrabold heading-premium tracking-tighter text-white leading-none">SkyCast<span className="text-accent-main italic font-black">Pro</span></h1>
+                    <p className="text-[10px] font-black text-text-dim uppercase tracking-[0.2em] mt-1">Intelligence Layer</p>
+                </div>
             </div>
 
-            <nav className="flex flex-col gap-3">
+            <nav className="flex flex-col gap-4">
                 {menuItems.map((item) => (
                     <button
                         key={item.id}
                         onClick={() => onTabChange(item.id)}
-                        className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 border border-transparent ${activeTab === item.id
-                            ? 'bg-accent-main text-white shadow-xl shadow-indigo-500/30 border-white/10'
-                            : 'text-text-secondary hover:bg-glass-bg hover:text-text-primary hover:border-glass-border'
+                        className={`nav-item flex items-center gap-5 px-6 py-5 transition-all duration-500 border border-transparent ${activeTab === item.id
+                            ? 'active'
+                            : 'text-text-secondary'
                             }`}
                     >
-                        <item.icon size={22} />
-                        <span className="font-semibold">{item.label}</span>
+                        <item.icon size={20} className={`${activeTab === item.id ? 'opacity-100' : 'opacity-60'}`} />
+                        <span className={`font-extrabold tracking-tight ${activeTab === item.id ? 'text-white' : 'text-inherit'}`}>{item.label}</span>
                     </button>
                 ))}
             </nav>
 
-            <div className="mt-auto pt-6 border-t border-glass-border">
-                <button className="flex items-center gap-4 px-5 py-4 rounded-2xl text-text-secondary hover:bg-glass-bg hover:text-text-primary w-full transition-all border border-transparent hover:border-glass-border">
-                    <Settings size={22} />
-                    <span className="font-semibold">Settings</span>
+            <div className="mt-auto pt-8 border-t border-white/5">
+                <button className="nav-item flex items-center gap-5 px-6 py-5 text-text-dim hover:text-white group">
+                    <Settings size={20} className="opacity-60 group-hover:rotate-45 transition-transform duration-500" />
+                    <span className="font-extrabold tracking-tight">System Settings</span>
                 </button>
             </div>
         </aside>

@@ -1,5 +1,4 @@
-import React from 'react';
-import { CloudRain, Sun, Wind, Droplets } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ForecastView = ({ data }) => {
     // Priority: Real data from API, then mock data for free tier
@@ -7,7 +6,7 @@ const ForecastView = ({ data }) => {
         day: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
         temp: details.avgtemp,
         condition: details.condition || 'Clear',
-        icon: Sun // Defaulting to Sun for now, could map more icons
+        icon: Sun
     })) : [
         { day: 'Mon', temp: 22, condition: 'Sunny', icon: Sun },
         { day: 'Tue', temp: 19, condition: 'Cloudy', icon: Wind },
@@ -19,43 +18,60 @@ const ForecastView = ({ data }) => {
     ];
 
     return (
-        <div className="flex flex-col gap-10 animate-fade-in">
-            <div className="glass-panel p-10 lg:p-12 shadow-2xl">
-                <div className="flex justify-between items-center mb-10">
-                    <h2 className="text-3xl font-bold font-accent text-white tracking-tight uppercase">Extended Climate Forecast</h2>
-                    <div className="px-4 py-2 bg-accent-main/10 border border-accent-main/20 rounded-xl text-accent-main text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md">
-                        7-Day Projection
+        <div className="flex flex-col gap-10">
+            <div className="glass-panel p-10 lg:p-16 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-accent-main/5 blur-[120px] rounded-full"></div>
+
+                <div className="flex justify-between items-end mb-12">
+                    <div>
+                        <span className="px-4 py-1.5 bg-accent-main/10 border border-accent-main/20 rounded-full text-accent-main text-[10px] font-black uppercase tracking-[0.3em] mb-4 inline-block">
+                            Climate Intelligence
+                        </span>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold heading-premium text-white tracking-tighter text-gradient leading-none">Extended Forecast</h2>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-3xl font-black text-white heading-premium mb-1">7 Days</p>
+                        <p className="text-[10px] font-black text-text-dim uppercase tracking-widest">Confidence: 94%</p>
                     </div>
                 </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
                     {forecastDays.map((item, index) => (
-                        <div key={index} className="glass-card p-4 flex flex-col items-center gap-3 text-center">
-                            <span className="text-sm font-semibold text-text-secondary uppercase">{item.day}</span>
-                            <item.icon className="w-8 h-8 text-accent-main" />
-                            <div className="text-xl font-bold">{item.temp}°</div>
-                            <span className="text-xs text-text-secondary">{item.condition}</span>
-                        </div>
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="glass-card p-8 flex flex-col items-center gap-6 text-center border-white/5 hover:border-accent-main/20"
+                        >
+                            <span className="text-[10px] font-black text-text-dim uppercase tracking-[0.3em]">{item.day}</span>
+                            <div className="w-16 h-16 bg-white/[0.02] rounded-2xl flex items-center justify-center p-3">
+                                <item.icon className="w-full h-full text-accent-main" />
+                            </div>
+                            <div className="text-3xl font-extrabold heading-premium text-white">{item.temp}°</div>
+                            <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">{item.condition}</span>
+                        </motion.div>
                     ))}
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
-                <ForecastDetailCard title="Precipitation" value="12%" icon={Droplets} />
-                <ForecastDetailCard title="Humidity" value="64%" icon={Wind} />
-                <ForecastDetailCard title="UV Index" value="High" icon={Sun} />
+            <div className="grid grid-cols-3 gap-8">
+                <ForecastDetailCard title="Probability of Precipitation" value="12%" icon={Droplets} />
+                <ForecastDetailCard title="Atmospheric Humidity" value="64%" icon={Wind} />
+                <ForecastDetailCard title="Solar Radiation Index" value="High" icon={Sun} />
             </div>
         </div>
     );
 };
 
 const ForecastDetailCard = ({ title, value, icon: Icon }) => (
-    <div className="glass-card p-6 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-glass-bg flex items-center justify-center">
-            <Icon className="text-accent-main w-6 h-6" />
+    <div className="glass-card p-8 flex items-center gap-6 group">
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.02] flex items-center justify-center border border-white/5 transition-all duration-500 group-hover:border-accent-main/20 group-hover:bg-accent-main/5">
+            <Icon className="text-accent-main w-8 h-8 group-hover:scale-110 transition-transform" />
         </div>
         <div>
-            <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold">{title}</p>
-            <p className="text-xl font-bold">{value}</p>
+            <p className="text-[10px] text-text-dim uppercase tracking-[0.3em] font-black mb-1">{title}</p>
+            <p className="text-2xl font-black heading-premium text-white">{value}</p>
         </div>
     </div>
 );

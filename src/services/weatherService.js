@@ -1,13 +1,9 @@
 import axios from 'axios';
 
-const API_KEY = '9dce8151db29057351d1ec571dbf5e3c';
-const BASE_URL = 'http://api.weatherstack.com'; // Using http as free/trial keys often don't support https
+const BASE_URL = '/api/weather'; // Use Vercel proxy
 
 const weatherApi = axios.create({
   baseURL: BASE_URL,
-  params: {
-    access_key: API_KEY,
-  },
 });
 
 // Helper to handle API errors consistently
@@ -32,8 +28,8 @@ const handleApiError = (error, context) => {
 export const weatherService = {
   getCurrent: async (query) => {
     try {
-      const response = await weatherApi.get('/current', {
-        params: { query },
+      const response = await weatherApi.get('', {
+        params: { query, type: 'current' },
       });
       if (response.data.error) {
         const err = response.data.error;
@@ -49,8 +45,8 @@ export const weatherService = {
 
   getForecast: async (query, days = 7) => {
     try {
-      const response = await weatherApi.get('/forecast', {
-        params: { query, forecast_days: days },
+      const response = await weatherApi.get('', {
+        params: { query, type: 'forecast', forecast_days: days },
       });
       if (response.data.error) {
         const err = response.data.error;
@@ -66,8 +62,8 @@ export const weatherService = {
 
   getHistorical: async (query, date) => {
     try {
-      const response = await weatherApi.get('/historical', {
-        params: { query, historical_date: date },
+      const response = await weatherApi.get('', {
+        params: { query, type: 'historical', date },
       });
       if (response.data.error) {
         const err = response.data.error;
@@ -83,8 +79,8 @@ export const weatherService = {
 
   getMarine: async (query) => {
     try {
-      const response = await weatherApi.get('/marine', {
-        params: { query },
+      const response = await weatherApi.get('', {
+        params: { query, type: 'marine' },
       });
       if (response.data.error) {
         const err = response.data.error;
